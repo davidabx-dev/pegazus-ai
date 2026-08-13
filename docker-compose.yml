@@ -1,0 +1,141 @@
+version: "3.8"
+
+services:
+  # 1. Aplicação Web FastAPI
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pegazus_web
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      - APP_NAME=Pegazus-AI
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASSWORD:-guest}@rabbitmq:5672//
+      - REDIS_URL=redis://redis:6379/0
+      - QDRANT_LOCATION=http://qdrant:6333
+      - LLM_PROVIDER=groq
+      - EMBEDDING_PROVIDER=fastembed
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # 2. Worker Celery para Ingestão Assíncrona
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pegazus_celery_worker
+    command: celery -A pegazus_ai.core.celery_app worker --loglevel=info -Q ingestion_queue -c 2
+    environment:
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASSWORD:-guest}@rabbitmq:5672//
+      - REDIS_URL=redis://redis:6379/0
+      - QDRANT_LOCATION=http://qdrant:6333
+      - EMBEDDING_PROVIDER=fastembed
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # 3. Message Broker RabbitMQ com painel Management e DLQ
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: pegazus_rabbitmq
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"  # Painel HTTP acessível apenas em localhost
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # 4. Cache Semântico e Result Backend Redis
+  redis:
+    image: redis:7-alpine
+    container_name: pegazus_redis
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # 5. Vector Store Qdrant com Persistência em Disco
+  qdrant:
+    image: qdrant/qdrant:v1.8.0
+    container_name: pegazus_qdrant
+    ports:
+      - "127.0.0.1:6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:6333/readyz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # 6. Banco de Dados Relacional PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: pegazus_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pegazus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pegazus_password}
+      POSTGRES_DB: ${POSTGRES_DB:-pegazus_db}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pegazus} -d ${POSTGRES_DB:-pegazus_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  qdrant_data:
+  postgres_data:
+  redis_data:

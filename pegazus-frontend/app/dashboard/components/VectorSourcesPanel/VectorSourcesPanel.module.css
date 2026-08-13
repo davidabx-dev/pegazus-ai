@@ -1,0 +1,46 @@
+.panelTitle {
+  font-size: 17px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.025em;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 10;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem;
+  margin: auto 0;
+  position: relative;
+  z-index: 10;
+}
+
+.emptyIconWrapper {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1rem;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.emptyTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #e2e8f0;
+  margin-bottom: 0.25rem;
+}
+
+.emptySubtitle {
+  font-size: 0.75rem;
+  color: #8b9bb4;
+  max-width: 260px;
+}
