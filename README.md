@@ -406,10 +406,24 @@ docker stats
 
 ---
 
-## 📄 Licença
+## 👨‍💻 Autor
 
-Defina aqui a licença do projeto (ex: MIT, Apache 2.0, ou proprietária/uso interno).
+Desenvolvido com dedicação por **[David](https://github.com/davidabx-dev)**.
+
+[![GitHub](https://img.shields.io/badge/GitHub-davidabx--dev-181717?style=for-the-badge&logo=github)](https://github.com/davidabx-dev)
+[![Repositório](https://img.shields.io/badge/Pegazus--AI-Repository-6366f1?style=for-the-badge&logo=git)](https://github.com/davidabx-dev/pegazus-ai)
 
 ---
 
-<p align="center">Feito com ❤️ e bastante café ☕</p>
+## 📄 Licença
+
+Este projeto está licenciado sob a **Licença MIT** — consulte o arquivo [LICENSE](./LICENSE) para mais detalhes.
+
+Copyright (c) 2025 **DavidABx**
+
+---
+
+<p align="center">Feito com foco em segurança, alta performance e IA por <b>David</b> 🚀</p>
+
+
+
