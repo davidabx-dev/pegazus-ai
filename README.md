@@ -411,7 +411,7 @@ docker stats
 Desenvolvido com dedicação por **[David](https://github.com/davidabx-dev)**.
 
 [![GitHub](https://img.shields.io/badge/GitHub-davidabx--dev-181717?style=for-the-badge&logo=github)](https://github.com/davidabx-dev)
-[![Repositório](https://img.shields.io/badge/Pegazus--AI-Repository-6366f1?style=for-the-badge&logo=git)](https://github.com/davidabx-dev/pegazus-ai)
+[![Repositório](https://img.shields.io/badge/Pegazus--AI-Repository-6366f1?style=for-the-badge&logo=git)](https://github.com/davidabx-dev?tab=repositories)
 
 ---
 
