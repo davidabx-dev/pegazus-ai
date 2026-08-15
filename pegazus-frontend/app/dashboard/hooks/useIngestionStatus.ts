@@ -21,14 +21,16 @@ export function useIngestionStatus(authState: any) {
       for (const task of pendingTasks) {
         try {
           const data: any = await apiFetch(`/ingest/status/${task.taskId}`, {}, authState);
+          const chunks = data.result?.chunks_created ?? data.chunks_created ?? task.chunksCreated;
+          const msg = data.result?.message ?? data.message ?? task.message;
           setTasks((prev) =>
             prev.map((t) =>
               t.taskId === task.taskId
                 ? {
                     ...t,
                     status: data.status,
-                    chunksCreated: data.chunks_created || t.chunksCreated,
-                    message: data.message || t.message,
+                    chunksCreated: chunks,
+                    message: msg,
                   }
                 : t
             )
@@ -48,37 +50,41 @@ export function useIngestionStatus(authState: any) {
     setUploading(true);
     setUploadError(null);
 
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append('files', files[i]);
-    }
+    const fileList = Array.from(files);
+    const newTasks: TaskProgress[] = [];
 
-    try {
-      const data: any = await apiFetch(
-        '/ingest/upload',
-        {
-          method: 'POST',
-          body: formData,
-        },
-        authState
-      );
+    for (const file of fileList) {
+      const formData = new FormData();
+      formData.append('file', file);
 
-      if (data.tasks && Array.isArray(data.tasks)) {
-        const newTasks: TaskProgress[] = data.tasks.map((t: any) => ({
-          taskId: t.task_id,
-          documentId: t.document_id,
-          filename: t.filename,
-          status: 'ACCEPTED',
-          message: t.message,
-        }));
+      try {
+        const data: any = await apiFetch(
+          '/ingest/file',
+          {
+            method: 'POST',
+            body: formData,
+          },
+          authState
+        );
 
-        setTasks((prev) => [...newTasks, ...prev]);
+        if (data && data.task_id) {
+          newTasks.push({
+            taskId: data.task_id,
+            documentId: data.document_id,
+            filename: file.name,
+            status: data.status || 'ACCEPTED',
+            message: data.message || `Arquivo '${file.name}' em processamento.`,
+          });
+        }
+      } catch (err: any) {
+        setUploadError(err.message || `Erro durante o upload do arquivo ${file.name}.`);
       }
-    } catch (err: any) {
-      setUploadError(err.message || 'Erro durante o upload de documento.');
-    } finally {
-      setUploading(false);
     }
+
+    if (newTasks.length > 0) {
+      setTasks((prev) => [...newTasks, ...prev]);
+    }
+    setUploading(false);
   };
 
   // Document Delete Handler

@@ -45,11 +45,23 @@ export function useRagQuery(authState: any) {
     setQuerying(true);
 
     try {
+      const formattedHistory = messages
+        .filter((m) => m.id !== 'welcome' && (m.role === 'user' || m.role === 'assistant'))
+        .slice(-6)
+        .map((m) => ({
+          role: m.role,
+          content: m.content,
+        }));
+
       const data: any = await apiFetch(
-        '/rag/query',
+        '/query',
         {
           method: 'POST',
-          body: JSON.stringify({ query: userMessageText, top_k: 4 }),
+          body: JSON.stringify({
+            question: userMessageText,
+            top_k: 4,
+            history: formattedHistory,
+          }),
         },
         authState
       );
