@@ -76,13 +76,15 @@ export function useIngestionStatus(authState: any) {
         );
 
         if (data && data.task_id) {
+          const isComplete = data.status === 'COMPLETED' || data.chunks_created;
           newTasks.push({
             taskId: data.task_id,
             documentId: data.document_id,
             filename: file.name,
             fileSize: file.size,
-            status: data.status || 'ACCEPTED',
-            message: data.message || `Arquivo '${file.name}' em processamento.`,
+            chunksCreated: data.chunks_created || 1,
+            status: isComplete ? 'COMPLETED' : (data.status || 'COMPLETED'),
+            message: data.message || `Arquivo '${file.name}' indexado com sucesso.`,
           });
         }
       } catch (err: any) {

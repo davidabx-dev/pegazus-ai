@@ -146,7 +146,7 @@ export function KnowledgeIngestion({
               <div>
                 <div className="text-label">Status</div>
                 <div className="text-sub">
-                  {uploading || metrics.inQueueCount > 0
+                  {uploading
                     ? 'Processing...'
                     : metrics.completedDocsCount > 0
                     ? 'Indexado'
@@ -154,8 +154,8 @@ export function KnowledgeIngestion({
                 </div>
               </div>
             </div>
-            {uploading || metrics.inQueueCount > 0 ? (
-              <div className={styles.statusProcessingCircle} title="Processando...">
+            {uploading ? (
+              <div className={styles.statusProcessingCircle} title="Enviando e processando arquivo...">
                 <div className={styles.statusSpinner}></div>
               </div>
             ) : (

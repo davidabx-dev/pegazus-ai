@@ -73,6 +73,16 @@ async def ingest_file_async(
             document_id=document_id
         )
 
+        if task.ready() and task.successful():
+            res_dict = task.result if isinstance(task.result, dict) else {}
+            return AsyncIngestResponse(
+                task_id=task.id,
+                document_id=document_id,
+                status="COMPLETED",
+                chunks_created=res_dict.get("chunks_created", 1),
+                message=res_dict.get("message") or f"Arquivo '{file.filename}' indexado com sucesso."
+            )
+
         return AsyncIngestResponse(
             task_id=task.id,
             document_id=document_id,

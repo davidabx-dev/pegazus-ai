@@ -14,6 +14,7 @@ class AsyncIngestResponse(BaseModel):
     task_id: str
     document_id: str
     status: str = "ACCEPTED"
+    chunks_created: Optional[int] = None
     message: str = "Ingestão agendada com sucesso para processamento assíncrono."
 
 class TaskStatusResponse(BaseModel):
