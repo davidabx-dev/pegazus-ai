@@ -78,21 +78,53 @@
   font-size: 0.875rem;
 }
 
-.checkCircle {
-  width: 1.25rem;
-  height: 1.25rem;
+.statusProcessingCircle {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  background: rgba(96, 165, 250, 0.15);
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statusSpinner {
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 50%;
+  border: 2px solid rgba(96, 165, 250, 0.25);
+  border-top-color: #60a5fa;
+  border-right-color: #c084fc;
+  animation: rotateSpinner 0.75s linear infinite;
+  box-shadow: 0 0 10px rgba(96, 165, 250, 0.4);
+}
+
+.statusCompletedCircle {
+  width: 1.35rem;
+  height: 1.35rem;
   border-radius: 50%;
   background-color: #102a20;
   border: 1px solid #10b981;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
 }
 
 .checkIcon {
-  width: 0.75rem;
-  height: 0.75rem;
+  width: 0.8rem;
+  height: 0.8rem;
   color: #10b981;
+}
+
+@keyframes rotateSpinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .storageHeader {

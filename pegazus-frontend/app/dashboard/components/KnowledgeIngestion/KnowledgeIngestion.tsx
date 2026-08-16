@@ -154,13 +154,15 @@ export function KnowledgeIngestion({
                 </div>
               </div>
             </div>
-            <div className={styles.checkCircle}>
-              {uploading || metrics.inQueueCount > 0 ? (
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', border: '2px solid #60a5fa', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }}></div>
-              ) : (
+            {uploading || metrics.inQueueCount > 0 ? (
+              <div className={styles.statusProcessingCircle} title="Processando...">
+                <div className={styles.statusSpinner}></div>
+              </div>
+            ) : (
+              <div className={styles.statusCompletedCircle} title="Operacional">
                 <Check className={styles.checkIcon} />
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Storage Used */}
