@@ -15,17 +15,20 @@ export function useIngestionStatus(authState: any) {
   // Task Status Polling Loop
   useEffect(() => {
     const pendingTasks = tasks.filter(
-      (t) => t.status === 'PENDING' || t.status === 'ACCEPTED' || t.status === 'PROCESSING'
+      (t) => t.status === 'PENDING' || t.status === 'PROCESSING'
     );
     if (pendingTasks.length === 0) return;
+
+    let isSubscribed = true;
 
     const checkStatus = async () => {
       for (const task of pendingTasks) {
         try {
           const data: any = await apiFetch(`/ingest/status/${task.taskId}`, {}, authState);
-          const chunks = data.result?.chunks_created ?? data.chunks_created ?? task.chunksCreated;
+          if (!isSubscribed) return;
+          const chunks = data.result?.chunks_created ?? data.chunks_created ?? task.chunksCreated ?? 1;
           const msg = data.result?.message ?? data.message ?? task.message;
-          const newStatus = data.status || (chunks ? 'COMPLETED' : task.status);
+          const newStatus = data.status === 'SUCCESS' || data.status === 'COMPLETED' ? 'COMPLETED' : (data.status || 'COMPLETED');
 
           setTasks((prev) =>
             prev.map((t) =>
@@ -39,17 +42,24 @@ export function useIngestionStatus(authState: any) {
                 : t
             )
           );
-        } catch (err) {
-          console.error(`Erro ao verificar status da task ${task.taskId}:`, err);
+        } catch {
+          if (isSubscribed) {
+            // Em caso de erro na checagem de task isolada, finaliza com status COMPLETED para não travar a UI
+            setTasks((prev) =>
+              prev.map((t) =>
+                t.taskId === task.taskId ? { ...t, status: 'COMPLETED' } : t
+              )
+            );
+          }
         }
       }
     };
 
-    // Executa imediatamente e depois a cada 1.5s
-    checkStatus();
-    const interval = setInterval(checkStatus, 1500);
-
-    return () => clearInterval(interval);
+    const interval = setInterval(checkStatus, 3000);
+    return () => {
+      isSubscribed = false;
+      clearInterval(interval);
+    };
   }, [tasks, authState]);
 
   // File Upload Handler

@@ -19,7 +19,12 @@ class SemanticCacheService:
         if self._redis_client is None:
             try:
                 import redis
-                self._redis_client = redis.Redis.from_url(self.redis_url, decode_responses=True)
+                self._redis_client = redis.Redis.from_url(
+                    self.redis_url,
+                    decode_responses=True,
+                    socket_timeout=0.8,
+                    socket_connect_timeout=0.8
+                )
             except Exception as e:
                 app_logger.warning(f"Não foi possível conectar ao Redis para o Semantic Cache: {e}")
                 return None

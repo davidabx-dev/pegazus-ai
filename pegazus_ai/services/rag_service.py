@@ -30,18 +30,40 @@ class LLMService:
 
     def __init__(self, provider: str = None):
         self.provider = provider or settings.LLM_PROVIDER
+        self._groq_llm = None
+        self._gemini_llm = None
+
+    def _get_groq_llm(self):
+        if self._groq_llm is None:
+            if not settings.GROQ_API_KEY:
+                raise ValueError("GROQ_API_KEY não configurada no ambiente.")
+            from langchain_groq import ChatGroq
+            self._groq_llm = ChatGroq(
+                groq_api_key=settings.GROQ_API_KEY,
+                model_name=settings.GROQ_MODEL_NAME,
+                temperature=0.2,
+                timeout=25,
+                max_retries=2
+            )
+        return self._groq_llm
+
+    def _get_gemini_llm(self):
+        if self._gemini_llm is None:
+            if not settings.GOOGLE_API_KEY:
+                raise ValueError("GOOGLE_API_KEY não configurada no ambiente.")
+            from langchain_google_genai import ChatGoogleGenerativeAI
+            self._gemini_llm = ChatGoogleGenerativeAI(
+                google_api_key=settings.GOOGLE_API_KEY,
+                model=settings.GOOGLE_MODEL_NAME,
+                temperature=0.2,
+                timeout=25
+            )
+        return self._gemini_llm
 
     def generate_response(self, prompt: str, retrieved_texts: List[str]) -> str:
         if self.provider == "groq":
-            if not settings.GROQ_API_KEY:
-                raise ValueError("GROQ_API_KEY não configurada no ambiente.")
             try:
-                from langchain_groq import ChatGroq
-                llm = ChatGroq(
-                    groq_api_key=settings.GROQ_API_KEY,
-                    model_name=settings.GROQ_MODEL_NAME,
-                    temperature=0.2
-                )
+                llm = self._get_groq_llm()
                 res = llm.invoke(prompt)
                 return res.content
             except Exception as e:
@@ -49,15 +71,8 @@ class LLMService:
                 raise RuntimeError(f"Falha na comunicação com o provedor de LLM (Groq): {e}")
 
         elif self.provider == "google":
-            if not settings.GOOGLE_API_KEY:
-                raise ValueError("GOOGLE_API_KEY não configurada no ambiente.")
             try:
-                from langchain_google_genai import ChatGoogleGenerativeAI
-                llm = ChatGoogleGenerativeAI(
-                    google_api_key=settings.GOOGLE_API_KEY,
-                    model=settings.GOOGLE_MODEL_NAME,
-                    temperature=0.2
-                )
+                llm = self._get_gemini_llm()
                 res = llm.invoke(prompt)
                 return res.content
             except Exception as e:
