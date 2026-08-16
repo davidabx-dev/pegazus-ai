@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         accessToken,
         refreshToken,
         userEmail,
-        isAuthenticated: !!accessToken || (!isInitialized ? true : false),
+        isAuthenticated: !!accessToken,
         login,
         logout,
         updateTokens,
