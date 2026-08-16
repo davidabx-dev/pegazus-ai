@@ -20,8 +20,8 @@ export function VectorSourcesPanel({
   const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null);
 
   return (
-    <section className="lg:col-span-4 flex flex-col gap-5">
-      <div className="main-panel max-w-none h-[640px] flex flex-col relative overflow-hidden">
+    <section className={styles.panelContainer}>
+      <div className="main-panel max-w-none h-[640px]" style={{ display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
         <h2 className={styles.panelTitle}>
           Fontes Vetoriais Recuperadas {sources.length > 0 && `(${sources.length})`}
         </h2>
@@ -29,7 +29,7 @@ export function VectorSourcesPanel({
         {sources.length === 0 ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIconWrapper}>
-              <FileText className="w-7 h-7 text-slate-400" />
+              <FileText style={{ width: '1.75rem', height: '1.75rem', color: '#94a3b8' }} />
             </div>
             <p className={styles.emptyTitle}>Nenhuma fonte recuperada ainda</p>
             <p className={styles.emptySubtitle}>
@@ -37,8 +37,8 @@ export function VectorSourcesPanel({
             </p>
           </div>
         ) : (
-          <div className="scroll-container relative z-10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="scroll-container" style={{ position: 'relative', zIndex: 10 }}>
+            <div className={styles.cardsGrid}>
               {sources.map((src, index) => (
                 <SourceCard
                   key={index}
@@ -55,7 +55,7 @@ export function VectorSourcesPanel({
         )}
 
         {/* Ícone decorativo de Estrela 4 pontas no canto inferior direito */}
-        <svg className="corner-star text-indigo-400/40" viewBox="0 0 24 24" fill="currentColor">
+        <svg className="corner-star" style={{ color: 'rgba(129, 140, 248, 0.4)' }} viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 0C12 6.627 17.373 12 24 12C17.373 12 12 17.373 12 24C12 17.373 6.627 12 0 12C6.627 12 12 6.627 12 0Z" />
         </svg>
       </div>

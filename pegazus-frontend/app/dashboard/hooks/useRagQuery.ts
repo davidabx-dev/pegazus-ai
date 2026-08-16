@@ -10,7 +10,7 @@ export function useRagQuery(authState: any) {
       id: 'welcome',
       role: 'assistant',
       content: 'Olá! Sou o assistente Pegazus-AI. Envie seus documentos (.pdf, .docx, .txt, .md) na coluna ao lado e faça suas perguntas operacionais!',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: 'Agora',
     },
   ]);
   const [inputQuery, setInputQuery] = useState('');

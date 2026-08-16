@@ -15,17 +15,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <head>
-        <script src="https://cdn.tailwindcss.com"></script>
-      </head>
-      <body className="text-slate-200 min-h-screen p-4 md:p-6 flex flex-col justify-between overflow-x-hidden relative">
+      <body className="app-body">
         {/* Animação de Vídeo em Loop de Fundo */}
         <video
           autoPlay
           loop
           muted
           playsInline
-          className="fixed inset-0 w-full h-full object-cover pointer-events-none z-[-1]"
+          className="bg-video-loop"
         >
           <source src="/background_loop.mp4" type="video/mp4" />
         </video>

@@ -32,7 +32,7 @@ export function KnowledgeIngestion({
   metrics,
 }: KnowledgeIngestionProps) {
   return (
-    <section className="lg:col-span-3 flex flex-col gap-5">
+    <section className={styles.sectionContainer}>
       <div className="main-panel max-w-none">
         <h2 className={styles.sectionTitle}>Ingestão de Conhecimento</h2>
 
@@ -49,13 +49,13 @@ export function KnowledgeIngestion({
             setIsDragOver(false);
             onFileUpload(e.dataTransfer.files);
           }}
-          className={`upload-area mt-4 mb-6 ${isDragOver ? 'border-blue-400 bg-blue-900/20' : ''}`}
+          className="upload-area"
         >
           <div className="icon-glow-bg"></div>
 
-          <div className="relative z-10 flex flex-col items-center">
+          <div className={styles.uploadContent}>
             <svg
-              className="w-16 h-16 mb-4 text-[#8b9bb4] drop-shadow-[0_0_12px_rgba(79,130,220,0.4)]"
+              className={styles.uploadCloudIcon}
               viewBox="0 0 64 64"
               fill="none"
             >
@@ -82,9 +82,9 @@ export function KnowledgeIngestion({
               </defs>
             </svg>
 
-            <span className="text-white text-sm font-medium tracking-wide mb-4">Área de Upload suportados</span>
+            <span className={styles.uploadTitle}>Área de Upload suportados</span>
 
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className={styles.badgesRow}>
               <span className="badge-item">PDF</span>
               <span className="badge-item">DOCX</span>
               <span className="badge-item">TXT</span>
@@ -92,8 +92,8 @@ export function KnowledgeIngestion({
               <span className="badge-item">PNG / JPG</span>
             </div>
 
-            {uploading && <p className="text-xs text-indigo-400 mt-3 animate-pulse">Enviando e parsing OCR...</p>}
-            {uploadError && <p className="text-xs text-rose-400 mt-3">{uploadError}</p>}
+            {uploading && <p className={styles.uploadingText}>Enviando e parsing OCR...</p>}
+            {uploadError && <p className={styles.uploadErrorText}>{uploadError}</p>}
           </div>
 
           <input
@@ -102,12 +102,12 @@ export function KnowledgeIngestion({
             onChange={(e) => onFileUpload(e.target.files)}
             multiple
             accept=".pdf,.docx,.txt,.md,.png,.jpg,.jpeg,.webp"
-            className="hidden"
+            className={styles.hiddenInput}
           />
         </div>
 
         {/* Status Metrics Cards */}
-        <div className="flex flex-col gap-3">
+        <div className={styles.statCardsGroup}>
           {/* Documents Processed */}
           <div className="stat-card">
             <div className="stat-left">
@@ -117,7 +117,7 @@ export function KnowledgeIngestion({
               </svg>
               <span className="text-label">Documents Processed</span>
             </div>
-            <span className="text-white font-semibold text-sm">{metrics.completedDocsCount}</span>
+            <span className={styles.statValue}>{metrics.completedDocsCount}</span>
           </div>
 
           {/* In Queue */}
@@ -131,7 +131,7 @@ export function KnowledgeIngestion({
                 <div className="text-label">In Queue</div>
               </div>
             </div>
-            <span className="text-white font-semibold text-sm">{metrics.inQueueCount}</span>
+            <span className={styles.statValue}>{metrics.inQueueCount}</span>
           </div>
 
           {/* Status */}
@@ -147,14 +147,14 @@ export function KnowledgeIngestion({
                 <div className="text-sub">Processing</div>
               </div>
             </div>
-            <div className="w-5 h-5 rounded-full bg-[#102a20] border border-[#10b981] flex items-center justify-center">
-              <Check className="w-3 h-3 text-[#10b981]" />
+            <div className={styles.checkCircle}>
+              <Check className={styles.checkIcon} />
             </div>
           </div>
 
           {/* Storage Used */}
-          <div className="stat-card flex-col items-stretch gap-1">
-            <div className="flex justify-between items-center w-full">
+          <div className="stat-card" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '4px' }}>
+            <div className={styles.storageHeader}>
               <div className="stat-left">
                 <svg className="icon-sm" viewBox="0 0 24 24">
                   <ellipse cx="12" cy="5" rx="9" ry="3" />
@@ -163,7 +163,7 @@ export function KnowledgeIngestion({
                 </svg>
                 <span className="text-label">Storage Used</span>
               </div>
-              <span className="text-[#9ca8bc] font-medium text-[13px]">{metrics.estimatedStorage} MB</span>
+              <span className={styles.storageValue}>{metrics.estimatedStorage} MB</span>
             </div>
             <div className="progress-track">
               <div

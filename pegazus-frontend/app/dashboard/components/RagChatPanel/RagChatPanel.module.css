@@ -1,3 +1,10 @@
+.panelContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
 .panelRag {
   position: relative;
   border: 1px solid rgba(153, 102, 255, 0.82);
@@ -119,4 +126,89 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
+}
+
+.loadingTextRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #86eaff;
+}
+
+.loadingDots {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.dot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background-color: #86eaff;
+  animation: bounceDot 1.4s infinite ease-in-out both;
+}
+
+.dot2 {
+  animation-delay: 0.2s;
+}
+
+.dot3 {
+  animation-delay: 0.4s;
+}
+
+.inputInner {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #0f141f;
+  border: 1px solid rgba(134, 144, 166, 0.4);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.chatInput {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-size: 0.75rem;
+  color: #d9deea;
+  outline: none;
+}
+
+.chatInput::placeholder {
+  color: #777e8e;
+}
+
+.chartIcon {
+  width: 1rem;
+  height: 1rem;
+  color: #788396;
+  flex-shrink: 0;
+}
+
+.iconMenu {
+  width: 1rem;
+  height: 1rem;
+  color: #8d99af;
+  cursor: pointer;
+}
+
+.iconCheck {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: #35d9ff;
+}
+
+.iconSend {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+@keyframes bounceDot {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1.0); }
 }

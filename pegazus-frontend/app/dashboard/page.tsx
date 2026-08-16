@@ -96,12 +96,12 @@ export default function DashboardPage() {
   if (!isAuthenticated) return null;
 
   return (
-    <div className="flex flex-col min-h-screen justify-between p-4 md:p-6 max-w-[1720px] mx-auto w-full">
+    <div className="dashboard-container">
       {/* Header */}
       <Header userEmail={userEmail} onLogout={logout} />
 
       {/* Main 3-Column Layout */}
-      <main className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
+      <main className="dashboard-main-grid">
         {/* Coluna Esquerda: Ingestão de Conhecimento */}
         <KnowledgeIngestion
           tasks={ingestion.tasks}
@@ -134,40 +134,40 @@ export default function DashboardPage() {
 
       {/* MODAL DE VISUALIZAÇÃO DE FONTE COMPLETA */}
       {selectedSource && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="glass-panel rounded-2xl max-w-2xl w-full p-6 border border-white/20 shadow-2xl relative flex flex-col gap-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-indigo-500/20 border border-indigo-500/30">
-                  <FileText className="w-5 h-5 text-indigo-400" />
+        <div className="modal-overlay">
+          <div className="modal-dialog">
+            <div className="modal-header">
+              <div className="modal-header-left">
+                <div className="modal-icon-badge">
+                  <FileText className="icon-sm" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-100">
+                  <h3 className="modal-title">
                     {selectedSource.metadata?.filename || 'Trecho do Documento'}
                   </h3>
-                  <span className="text-xs text-indigo-300 font-semibold">
+                  <span className="modal-score">
                     Relevância Vetorial: {(selectedSource.score * 100).toFixed(1)}%
                   </span>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedSource(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
+                className="modal-close-btn"
               >
-                <X className="w-5 h-5" />
+                <X className="icon-sm" />
               </button>
             </div>
 
-            <div className="bg-slate-950/70 border border-white/10 rounded-xl p-4 text-slate-200 text-sm leading-relaxed max-h-[350px] overflow-y-auto whitespace-pre-wrap">
+            <div className="modal-content-box">
               {selectedSource.content}
             </div>
 
             {selectedSource.metadata && Object.keys(selectedSource.metadata).length > 0 && (
-              <div className="flex flex-col gap-2 pt-2 border-t border-white/10">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Metadados Adicionais:</span>
-                <div className="flex flex-wrap gap-2">
+              <div className="modal-meta-section">
+                <span className="modal-meta-title">Metadados Adicionais:</span>
+                <div className="modal-meta-tags">
                   {Object.entries(selectedSource.metadata).map(([k, v]) => (
-                    <span key={k} className="px-2.5 py-1 rounded-lg bg-slate-800/80 border border-white/10 text-xs text-slate-300">
+                    <span key={k} className="modal-meta-tag">
                       <strong>{k}:</strong> {String(v)}
                     </span>
                   ))}

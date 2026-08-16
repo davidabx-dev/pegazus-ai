@@ -23,7 +23,7 @@ export function RagChatPanel({
   onSendQuery,
 }: RagChatPanelProps) {
   return (
-    <section className="lg:col-span-5 flex flex-col gap-5">
+    <section className={styles.panelContainer}>
       <div className={styles.panelRag}>
         <h2 className={styles.panelTitle}>Painel de Consulta RAG</h2>
 
@@ -50,14 +50,14 @@ export function RagChatPanel({
                       <span className={styles.aiSubtext}>RAG Engine • {m.timestamp}</span>
                     </div>
                   </div>
-                  <MoreVertical className="w-4 h-4 text-[#8d99af] cursor-pointer" />
+                  <MoreVertical className={styles.iconMenu} />
                 </div>
 
                 <div className={styles.aiContent}>{m.content}</div>
 
                 {m.sources && m.sources.length > 0 && (
                   <div className={styles.sourcesBadge}>
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#35d9ff]" />
+                    <CheckCircle2 className={styles.iconCheck} />
                     <span>
                       {new Set(m.sources.map((s) => s.metadata?.filename || s.metadata?.document_id || s.content)).size}{' '}
                       documento(s) recuperado(s) e verificado(s) no Qdrant
@@ -71,13 +71,13 @@ export function RagChatPanel({
           {/* Loading / Typing Indicator */}
           {querying && (
             <div className={`${styles.loadingCard} ai-card`}>
-              <div className="ai-avatar animate-spin">♙</div>
-              <div className="flex items-center gap-2 text-xs text-[#86eaff]">
+              <div className="ai-avatar" style={{ animation: 'spin 1s linear infinite' }}>♙</div>
+              <div className={styles.loadingTextRow}>
                 <span>Pegazus-AI consultando base vetorial Qdrant...</span>
-                <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#86eaff] animate-bounce"></span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#86eaff] animate-bounce [animation-delay:0.2s]"></span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#86eaff] animate-bounce [animation-delay:0.4s]"></span>
+                <span className={styles.loadingDots}>
+                  <span className={styles.dot}></span>
+                  <span className={`${styles.dot} ${styles.dot2}`}></span>
+                  <span className={`${styles.dot} ${styles.dot3}`}></span>
                 </span>
               </div>
             </div>
@@ -87,24 +87,25 @@ export function RagChatPanel({
 
         {/* Composer Form */}
         <form onSubmit={onSendQuery} className="composer-box">
-          <div className="relative flex-1 flex items-center bg-[#0f141f] border border-[#8690a6]/40 rounded-lg px-3 py-2 shadow-inner">
+          <div className={styles.inputInner}>
             <input
               type="text"
               value={inputQuery}
               onChange={(e) => setInputQuery(e.target.value)}
               placeholder="Digite sua dúvida operacional..."
               disabled={querying}
-              className="w-full bg-transparent text-xs text-[#d9deea] placeholder-[#777e8e] focus:outline-none"
+              className={styles.chatInput}
             />
-            <BarChart2 className="w-4 h-4 text-[#788396] shrink-0" />
+            <BarChart2 className={styles.chartIcon} />
           </div>
           <button
             type="submit"
             disabled={querying || !inputQuery.trim()}
-            className="btn-send flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-send"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
           >
             <span>Enviar</span>
-            <Send className="w-3.5 h-3.5" />
+            <Send className={styles.iconSend} />
           </button>
         </form>
       </div>
