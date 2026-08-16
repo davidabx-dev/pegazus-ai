@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CloudUpload, FileText, Check } from 'lucide-react';
 import { TaskProgress } from '../../types/dashboard.types';
 import styles from './KnowledgeIngestion.module.css';
@@ -32,6 +32,21 @@ export function KnowledgeIngestion({
   onFileUpload,
   metrics,
 }: KnowledgeIngestionProps) {
+  const [showSuccess, setShowSuccess] = useState(false);
+  const prevUploadingRef = useRef(uploading);
+
+  useEffect(() => {
+    // Quando o upload termina com sucesso, exibe o check verde por 3.5s e depois volta ao estado neutro
+    if (prevUploadingRef.current && !uploading && !uploadError) {
+      setShowSuccess(true);
+      const timer = setTimeout(() => {
+        setShowSuccess(false);
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+    prevUploadingRef.current = uploading;
+  }, [uploading, uploadError]);
+
   return (
     <section className={styles.sectionContainer}>
       <div className="main-panel max-w-none">
@@ -48,7 +63,9 @@ export function KnowledgeIngestion({
           onDrop={(e) => {
             e.preventDefault();
             setIsDragOver(false);
-            onFileUpload(e.dataTransfer.files);
+            if (e.dataTransfer.files) {
+              onFileUpload(e.dataTransfer.files);
+            }
           }}
           className="upload-area"
         >
@@ -99,7 +116,7 @@ export function KnowledgeIngestion({
 
           <input
             type="file"
-            ref={fileInputRef}
+            ref={fileInputRef as any}
             onChange={(e) => onFileUpload(e.target.files)}
             multiple
             accept=".pdf,.docx,.txt,.md,.png,.jpg,.jpeg,.webp"
@@ -112,11 +129,10 @@ export function KnowledgeIngestion({
           {/* Documents Processed */}
           <div className="stat-card">
             <div className="stat-left">
-              <svg className="icon-sm" viewBox="0 0 24 24">
-                <rect x="5" y="2" width="14" height="20" rx="2" />
-                <line x1="12" y1="18" x2="12" y2="18.01" />
-              </svg>
-              <span className="text-label">Documents Processed</span>
+              <FileText className="icon-sm" />
+              <div>
+                <div className="text-label">Documents Processed</div>
+              </div>
             </div>
             <span className={styles.statValue}>{metrics.completedDocsCount}</span>
           </div>
@@ -125,8 +141,8 @@ export function KnowledgeIngestion({
           <div className="stat-card">
             <div className="stat-left">
               <svg className="icon-sm" viewBox="0 0 24 24">
-                <line x1="12" y1="19" x2="12" y2="5" />
-                <polyline points="5 12 12 5 19 12" />
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
               </svg>
               <div>
                 <div className="text-label">In Queue</div>
@@ -147,20 +163,24 @@ export function KnowledgeIngestion({
                 <div className="text-label">Status</div>
                 <div className="text-sub">
                   {uploading
-                    ? 'Processing...'
-                    : metrics.completedDocsCount > 0
-                    ? 'Indexado'
+                    ? 'Processando...'
+                    : showSuccess
+                    ? 'Concluído!'
                     : 'Aguardando'}
                 </div>
               </div>
             </div>
             {uploading ? (
-              <div className={styles.statusProcessingCircle} title="Enviando e processando arquivo...">
+              <div className={styles.statusProcessingCircle} title="Processando arquivo...">
                 <div className={styles.statusSpinner}></div>
               </div>
-            ) : (
-              <div className={styles.statusCompletedCircle} title="Operacional">
+            ) : showSuccess ? (
+              <div className={styles.statusCompletedCircle} title="Arquivo indexado com sucesso!">
                 <Check className={styles.checkIcon} />
+              </div>
+            ) : (
+              <div className={styles.statusIdleCircle} title="Aguardando novo envio">
+                <div className={styles.statusIdleDot}></div>
               </div>
             )}
           </div>
