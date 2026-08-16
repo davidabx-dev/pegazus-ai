@@ -18,6 +18,7 @@ interface KnowledgeIngestionProps {
     inQueueCount: number;
     totalChunks: number;
     estimatedStorage: string;
+    storagePercent?: number;
   };
 }
 
@@ -144,11 +145,21 @@ export function KnowledgeIngestion({
               </svg>
               <div>
                 <div className="text-label">Status</div>
-                <div className="text-sub">Processing</div>
+                <div className="text-sub">
+                  {uploading || metrics.inQueueCount > 0
+                    ? 'Processing...'
+                    : metrics.completedDocsCount > 0
+                    ? 'Indexado'
+                    : 'Aguardando'}
+                </div>
               </div>
             </div>
             <div className={styles.checkCircle}>
-              <Check className={styles.checkIcon} />
+              {uploading || metrics.inQueueCount > 0 ? (
+                <div style={{ width: '10px', height: '10px', borderRadius: '50%', border: '2px solid #60a5fa', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }}></div>
+              ) : (
+                <Check className={styles.checkIcon} />
+              )}
             </div>
           </div>
 
@@ -168,7 +179,10 @@ export function KnowledgeIngestion({
             <div className="progress-track">
               <div
                 className="progress-fill"
-                style={{ width: `${Math.min(100, Math.max(8, (metrics.totalChunks / 50) * 100))}%` }}
+                style={{
+                  width: `${metrics.storagePercent !== undefined ? metrics.storagePercent : 0}%`,
+                  transition: 'width 0.5s ease-in-out',
+                }}
               ></div>
             </div>
           </div>
@@ -178,7 +192,7 @@ export function KnowledgeIngestion({
       {/* Histórico de Ingestões */}
       {tasks.length > 0 && (
         <div className={styles.historyBox}>
-          <span className={styles.historyTitle}>Histórico de Ingestões</span>
+          <span className={styles.historyTitle}>Histórico de Ingestões ({tasks.length})</span>
           {tasks.map((task) => (
             <div key={task.taskId} className={styles.historyCard}>
               <div className={styles.fileMeta}>
@@ -186,6 +200,7 @@ export function KnowledgeIngestion({
                 <div className={styles.fileNameGroup}>
                   <span className={styles.filename}>{task.filename}</span>
                   <span className={styles.subText}>
+                    {task.fileSize ? `${(task.fileSize / 1024).toFixed(0)} KB • ` : ''}
                     {task.chunksCreated ? `${task.chunksCreated} chunks` : task.message}
                   </span>
                 </div>

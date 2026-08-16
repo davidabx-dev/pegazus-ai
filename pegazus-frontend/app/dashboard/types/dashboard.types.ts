@@ -2,6 +2,7 @@ export interface TaskProgress {
   taskId: string;
   documentId: string;
   filename: string;
+  fileSize?: number;
   status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'ACCEPTED';
   chunksCreated?: number;
   message?: string;

@@ -14,21 +14,25 @@ export function useIngestionStatus(authState: any) {
 
   // Task Status Polling Loop
   useEffect(() => {
-    const pendingTasks = tasks.filter((t) => t.status === 'PENDING' || t.status === 'ACCEPTED');
+    const pendingTasks = tasks.filter(
+      (t) => t.status === 'PENDING' || t.status === 'ACCEPTED' || t.status === 'PROCESSING'
+    );
     if (pendingTasks.length === 0) return;
 
-    const interval = setInterval(async () => {
+    const checkStatus = async () => {
       for (const task of pendingTasks) {
         try {
           const data: any = await apiFetch(`/ingest/status/${task.taskId}`, {}, authState);
           const chunks = data.result?.chunks_created ?? data.chunks_created ?? task.chunksCreated;
           const msg = data.result?.message ?? data.message ?? task.message;
+          const newStatus = data.status || (chunks ? 'COMPLETED' : task.status);
+
           setTasks((prev) =>
             prev.map((t) =>
               t.taskId === task.taskId
                 ? {
                     ...t,
-                    status: data.status,
+                    status: newStatus,
                     chunksCreated: chunks,
                     message: msg,
                   }
@@ -39,7 +43,11 @@ export function useIngestionStatus(authState: any) {
           console.error(`Erro ao verificar status da task ${task.taskId}:`, err);
         }
       }
-    }, 2500);
+    };
+
+    // Executa imediatamente e depois a cada 1.5s
+    checkStatus();
+    const interval = setInterval(checkStatus, 1500);
 
     return () => clearInterval(interval);
   }, [tasks, authState]);
@@ -72,6 +80,7 @@ export function useIngestionStatus(authState: any) {
             taskId: data.task_id,
             documentId: data.document_id,
             filename: file.name,
+            fileSize: file.size,
             status: data.status || 'ACCEPTED',
             message: data.message || `Arquivo '${file.name}' em processamento.`,
           });
@@ -96,9 +105,28 @@ export function useIngestionStatus(authState: any) {
 
   // Metrics Calculations
   const completedDocsCount = tasks.filter((t) => t.status === 'COMPLETED').length;
-  const inQueueCount = tasks.filter((t) => t.status === 'ACCEPTED' || t.status === 'PENDING').length;
+  const inQueueCount = tasks.filter((t) => t.status === 'ACCEPTED' || t.status === 'PENDING' || t.status === 'PROCESSING').length;
   const totalChunks = tasks.reduce((acc, t) => acc + (t.chunksCreated || 0), 0);
-  const estimatedStorage = (totalChunks * 0.005).toFixed(2);
+
+  // Armazenamento Real em Megabytes (MB)
+  const totalBytes = tasks.reduce((acc, t) => {
+    if (t.fileSize && t.fileSize > 0) return acc + t.fileSize;
+    if (t.chunksCreated && t.chunksCreated > 0) return acc + t.chunksCreated * 35000;
+    return acc;
+  }, 0);
+
+  const estimatedStorage = totalBytes > 0
+    ? (totalBytes / (1024 * 1024)).toFixed(2)
+    : totalChunks > 0
+    ? (totalChunks * 0.05).toFixed(2)
+    : '0.00';
+
+  // Porcentagem da Barra de Progresso (Cota base de 25 MB ou escala fluida por documento)
+  const storagePercent = totalBytes > 0
+    ? Math.min(100, Math.max(10, Math.round((totalBytes / (25 * 1024 * 1024)) * 100 * 4)))
+    : totalChunks > 0
+    ? Math.min(100, Math.max(10, totalChunks * 10))
+    : 0;
 
   return {
     tasks,
@@ -115,6 +143,7 @@ export function useIngestionStatus(authState: any) {
       inQueueCount,
       totalChunks,
       estimatedStorage,
+      storagePercent,
     },
   };
 }
