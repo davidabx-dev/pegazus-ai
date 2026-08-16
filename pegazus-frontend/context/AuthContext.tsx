@@ -7,6 +7,7 @@ interface AuthContextType {
   refreshToken: string | null;
   userEmail: string | null;
   isAuthenticated: boolean;
+  isInitialized: boolean;
   login: (access: string, refresh: string, email?: string) => void;
   logout: () => void;
   updateTokens: (access: string, refresh: string) => void;
@@ -81,6 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         refreshToken,
         userEmail,
         isAuthenticated: !!accessToken,
+        isInitialized,
         login,
         logout,
         updateTokens,

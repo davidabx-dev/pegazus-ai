@@ -13,17 +13,17 @@ import { RagChatPanel } from './components/RagChatPanel/RagChatPanel';
 import { VectorSourcesPanel } from './components/VectorSourcesPanel/VectorSourcesPanel';
 
 export default function DashboardPage() {
-  const { isAuthenticated, userEmail, logout, accessToken, refreshToken, updateTokens } = useAuth();
+  const { isAuthenticated, isInitialized, userEmail, logout, accessToken, refreshToken, updateTokens } = useAuth();
   const router = useRouter();
 
   const authState = { accessToken, refreshToken, updateTokens, logout };
 
-  // Auth Protection
+  // Auth Protection - Só redireciona se já inicializou e NÃO está autenticado
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (isInitialized && !isAuthenticated) {
       router.push('/login');
     }
-  }, [isAuthenticated, router]);
+  }, [isInitialized, isAuthenticated, router]);
 
   // Hooks
   const ingestion = useIngestionStatus(authState);

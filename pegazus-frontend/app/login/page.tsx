@@ -12,42 +12,14 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, isInitialized } = useAuth();
   const router = useRouter();
 
-  const cardRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/dashboard');
+    if (isInitialized && isAuthenticated) {
+      window.location.href = '/dashboard';
     }
-  }, [isAuthenticated, router]);
-
-  // Pointer 3D Card Movement Effect
-  useEffect(() => {
-    const handlePointerMove = (e: PointerEvent) => {
-      if (!cardRef.current) return;
-      const x = (e.clientX / window.innerWidth) * 2 - 1;
-      const y = (e.clientY / window.innerHeight) * 2 - 1;
-      const rx = -y * 2.2;
-      const ry = x * 2.6;
-      cardRef.current.style.transform = `perspective(1100px) rotateX(${rx}deg) rotateY(${ry}deg)`;
-    };
-
-    const handlePointerLeave = () => {
-      if (cardRef.current) {
-        cardRef.current.style.transform = '';
-      }
-    };
-
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerleave', handlePointerLeave);
-
-    return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerleave', handlePointerLeave);
-    };
-  }, []);
+  }, [isInitialized, isAuthenticated]);
 
   const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
     if (e) e.preventDefault();
@@ -68,7 +40,7 @@ export default function LoginPage() {
       if (response.ok) {
         const data = await response.json();
         login(data.access_token, data.refresh_token, userEmail);
-        router.push('/dashboard');
+        window.location.href = '/dashboard';
         return;
       }
 
@@ -88,18 +60,18 @@ export default function LoginPage() {
         if (loginRes.ok) {
           const data = await loginRes.json();
           login(data.access_token, data.refresh_token, userEmail);
-          router.push('/dashboard');
+          window.location.href = '/dashboard';
           return;
         }
       }
 
       // Fallback: Autentica com token de sessão seguro no frontend
       login('demo_access_token_pegazus', 'demo_refresh_token_pegazus', userEmail);
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     } catch {
       // Fallback em caso de offline/rede local
       login('demo_access_token_pegazus', 'demo_refresh_token_pegazus', userEmail);
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     } finally {
       setLoading(false);
     }
@@ -108,7 +80,7 @@ export default function LoginPage() {
   return (
     <div className={styles.loginContainer}>
       <main className={styles.loginShell}>
-        <section ref={cardRef} className={styles.loginCard}>
+        <section className={styles.loginCard}>
           <div className={styles.brand}>
             <span className={styles.bolt}>ϟ</span>
             <span>PEGAZÜS-AI</span>
